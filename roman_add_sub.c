@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 void usage() {
 	printf("./roman_add_sub <opt> <str1> <str2>\n");
@@ -32,6 +33,43 @@ int validate_input_string(char *temp) {
 	return 0;
 }
 
+char *Map1_keys[]   = {"IV",   "IX",    "XL"  , "XC",    "CD",   "CM"};
+char *Map1_values[] = {"IIII", "VIIII", "XXXX", "LXXXX", "CCCC", "DCCCC"};
+
+char *expand_string(char *input) {
+	int len, i = 0, index = 0;
+	bool found = false;
+	char tmp[2] = {'\0', '\0'};
+	char *output;
+
+	len = strlen(input);
+	output = (char *)calloc(1, 5*len*sizeof(char));
+	while (i < len-1) {
+		strncpy(tmp, input+i, 2);
+		for (int j = 0; j < 6; j++) {
+			if (strcmp(Map1_keys[j], tmp) == 0) {
+				found = true;
+				index = j;
+				break;
+			}
+		}
+		printf("(expand_string, i : %d ) Value of found : %d\n", i, found);
+		if (found) {
+			output = strcat(output, Map1_values[index]);
+			i = i+2;
+		} else {
+			output = strncat(output, input+i, 1);
+			i = i+1;
+		}
+		found = false;
+		tmp[0] = '\0';
+	}
+	if (i == len-1) {
+		output = strncat(output, input+len-1, 1);
+	}
+	return output;
+}
+
 int main(int argc, char *argv[]) {
 	if (argc != 4) {
 		printf("Please follow the instructions:\n");
@@ -40,8 +78,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	char *opt, *str1, *str2;
+	char *str1_exp = NULL, *str2_exp = NULL;
 	int ret;
 
+	(void) str2_exp;
 	opt = argv[1];
 	str1 = argv[2];
 	str2 = argv[3];
@@ -81,6 +121,37 @@ int main(int argc, char *argv[]) {
 	str2 = strdup(str2);
 
 	printf("Input 1 : %s\nInput 2 : %s\n", str1, str2);
+
+	if (opt[0] == '1') {
+		/* addition */
+		/* 1. expantion */
+		//str1_exp = (char *)malloc(5 * strlen(str1));
+		//str1_exp = '\0';
+		str1_exp = expand_string(str1);
+		
+		printf("Expanded string : %s\n", str1_exp);
+
+		/* 2. Concatenation */
+		/* 3. Sort */
+		/* 4. Compression */
+
+	} else {
+		/* subtraction */
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 	goto out;
 
 out:
