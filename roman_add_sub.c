@@ -125,13 +125,20 @@ int main(int argc, char *argv[]) {
 	if (opt[0] == '1') {
 		/* addition */
 		/* 1. expantion */
-		//str1_exp = (char *)malloc(5 * strlen(str1));
-		//str1_exp = '\0';
-		str1_exp = expand_string(str1);
-		
+		str1_exp = expand_string(str1);	
 		printf("Expanded string : %s\n", str1_exp);
 
+		str2_exp = expand_string(str2);
+		printf("Expanded string :%s\n", str2_exp);
+
 		/* 2. Concatenation */
+		char *big_str;
+
+		big_str = (char *)calloc(1, strlen(str1_exp) + strlen(str2_exp) + 1);
+		big_str = strcpy(big_str, str1_exp);
+		big_str = strcat(big_str, str2_exp);
+
+		printf("Big String : %s\n", big_str);
 		/* 3. Sort */
 		/* 4. Compression */
 
@@ -159,6 +166,11 @@ out:
 		free(str1);
 	if (str2)
 		free(str2);
+	if (str1_exp)
+		free(str1_exp);
+	if (str2_exp)
+		free(str2_exp);
+
 
 return 0;
 }
