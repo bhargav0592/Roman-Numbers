@@ -11,6 +11,21 @@ void usage() {
 	return ;
 }
 
+char *strrev(char *str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
+
 /*
  * String Should contain only I,V,X,L,C,D,M characters.
 */
@@ -70,6 +85,71 @@ char *expand_string(char *input) {
 	return output;
 }
 
+
+char roman_nos[] = {'I', 'V', 'X', 'L', 'C', 'D', 'M'};
+
+int get_roman_indx(char A) {
+	for (int i = 0; i < 7; i++) {
+		if (roman_nos[i] == A)
+			return i;
+	}
+	return -1;
+}
+
+bool A_greater_than_B(char A, char B) {
+	int indxA;
+	int indxB;
+
+	indxA = get_roman_indx(A);
+	indxB = get_roman_indx(B);
+
+	if (indxA > indxB)
+		return true;
+	return false;
+}
+
+int partition(char *input, int low, int high) {
+	int pivot, wall;
+	char temp;
+
+	pivot = high;
+	wall = low - 1;
+	for (int i = low; i < high; i++) {
+		if (A_greater_than_B(input[i], input[pivot])) {
+			//Do Nothing
+		} else {
+			wall++;
+			temp = input[wall];
+			input[wall] = input[i];
+			input[i] = temp;
+			//printf("Swaped indexex %d with %d\n", wall, i);
+		}
+	}
+	wall++;
+	temp = input[wall];
+	input[wall] = input[pivot];
+	input[pivot] = temp;
+	return wall;
+}
+
+void quick_sort(char *input, int low, int high) {
+	if (low < high) {
+		int pivot;
+
+		pivot = partition(input, low, high);
+		quick_sort(input, low, pivot-1);
+		quick_sort(input, pivot+1, high);
+	}
+}
+
+void sort_the_string(char *input) {
+	int len;
+
+	len = strlen(input);
+
+	quick_sort(input, 0, len-1);
+}
+
 int main(int argc, char *argv[]) {
 	if (argc != 4) {
 		printf("Please follow the instructions:\n");
@@ -79,6 +159,7 @@ int main(int argc, char *argv[]) {
 
 	char *opt, *str1, *str2;
 	char *str1_exp = NULL, *str2_exp = NULL;
+	char *big_str = NULL;
 	int ret;
 
 	(void) str2_exp;
@@ -132,7 +213,6 @@ int main(int argc, char *argv[]) {
 		printf("Expanded string :%s\n", str2_exp);
 
 		/* 2. Concatenation */
-		char *big_str;
 
 		big_str = (char *)calloc(1, strlen(str1_exp) + strlen(str2_exp) + 1);
 		big_str = strcpy(big_str, str1_exp);
@@ -140,23 +220,17 @@ int main(int argc, char *argv[]) {
 
 		printf("Big String : %s\n", big_str);
 		/* 3. Sort */
+		sort_the_string(big_str);
+		big_str = strrev(big_str);
+		printf("Big String (after sort) : %s\n", big_str);
+
+
 		/* 4. Compression */
 
 	} else {
 		/* subtraction */
 
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 
 	goto out;
@@ -174,3 +248,4 @@ out:
 
 return 0;
 }
+
