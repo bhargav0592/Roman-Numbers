@@ -26,6 +26,123 @@ char *strrev(char *str)
       return str;
 }
 
+char *get_str(char A, int len) {
+        char *output;
+        int div, rem;
+
+        output = (char *)calloc(1, (len+1) * sizeof(char));
+        if (A == 'I' && len >= 5) {
+                rem = len%5;
+                div = len/5;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "V", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "I", 1);
+        } else if (A == 'V' && len >= 2) {
+                rem = len%2;
+                div = len/2;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "X", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "V", 1);
+        } else if (A == 'X' && len >= 5) {
+                rem = len%5;
+                div = len/5;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "L", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "X", 1);
+        } else if (A == 'L' && len >= 2) {
+                rem = len%2;
+                div = len/2;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "C", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "L", 1);
+        } else if (A == 'C' && len >= 5) {
+                rem = len%5;
+                div = len/5;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "D", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "C", 1);
+        } else if (A == 'D' && len >= 2) {
+                rem = len%2;
+                div = len/2;
+                for (int i = 0; i < div; i++)
+                        output = strncat(output, "M", 1);
+                for (int i = 0; i < rem; i++)
+                        output = strncat(output, "D", 1);
+        } else {
+                for (int i = 0; i < len; i++)
+                        output = strncat(output, &A, 1);
+        }
+
+        return strrev(output);
+}
+
+char *string_compact(char *input) {
+        int strt, len, max_len, next_indx, cnt;
+        char temp;
+        char *output = NULL, *left_str = NULL, *mid_str = NULL, *right_str = NULL;
+
+        strt = 0;
+        max_len = len = strlen(input);
+        left_str = (char *)calloc(1, len * sizeof(char));
+        mid_str = (char *)calloc(1, len * sizeof(char));
+        right_str = (char *)calloc(1, len * sizeof(char));
+        output = (char *)calloc(1, len * sizeof(char));
+
+        while (strt < len) {
+                temp = input[strt];
+                cnt = 1;
+                next_indx = len;
+                for (int j = strt+1; j < len; j++) {
+                        if (input[j] == temp) {
+                                cnt++;
+                        } else {
+                                next_indx = j;
+                                break;
+                        }
+                }
+                //printf("(string_compact) input : %s, start : %d, cnt : %d and next_indx : %d\n", input, strt, cnt, next_indx);
+                if (output)
+                        memset(output, 0, max_len);
+                else
+                        output = (char *)calloc(1, len * sizeof(char));
+                if (left_str)
+                        memset(left_str, 0, max_len);
+                else
+                        left_str = (char *)calloc(1, len * sizeof(char));
+                if (mid_str)
+                        memset(mid_str, 0, max_len);
+                else
+                        mid_str = (char *)calloc(1, len * sizeof(char));
+                if (right_str)
+                        memset(right_str, 0, max_len);
+                else
+                        right_str = (char *)calloc(1, len * sizeof(char));
+                left_str = (strt > 0) ? strncpy(left_str, input, strt) : '\0';
+                //printf("(string_compact) left_str : %s, ", left_str);
+                right_str = (next_indx < len) ? strncpy(right_str, input+next_indx, len - next_indx) : '\0';
+                //printf("right_str : %s, and ", right_str);
+                mid_str = get_str(temp, cnt);
+                //printf("mid_str : %s\n", mid_str);
+                if (left_str)
+                        output = strncat(output, left_str, strlen(left_str));
+                output = strncat(output, mid_str, strlen(mid_str));
+                if (right_str)
+                        output = strncat(output, right_str, strlen(right_str));
+                if (strlen(mid_str) == cnt)
+                        strt = next_indx;
+                memset(input, 0, max_len);
+                input = strncpy(input, output, strlen(output));
+                len = strlen(input);
+                //printf("(string_compact) output : %s, strt : %d, len : %d\n", input, strt, len);
+        }
+        return input;
+}
+
 /*
  * String Should contain only I,V,X,L,C,D,M characters.
 */
@@ -160,6 +277,7 @@ int main(int argc, char *argv[]) {
 	char *opt, *str1, *str2;
 	char *str1_exp = NULL, *str2_exp = NULL;
 	char *big_str = NULL;
+	char *comp_str = NULL;
 	int ret;
 
 	(void) str2_exp;
@@ -221,12 +339,12 @@ int main(int argc, char *argv[]) {
 		printf("Big String : %s\n", big_str);
 		/* 3. Sort */
 		sort_the_string(big_str);
-		big_str = strrev(big_str);
+		//big_str = strrev(big_str);
 		printf("Big String (after sort) : %s\n", big_str);
-
-
+		comp_str = string_compact(big_str);
+		comp_str = strrev(big_str);
+		printf("String (after compact) : %s\n", comp_str);
 		/* 4. Compression */
-
 	} else {
 		/* subtraction */
 
